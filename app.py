@@ -264,7 +264,7 @@ def add_expense():
         return redirect(url_for("login"))
 
     CATEGORIES = ["Food", "Transport", "Entertainment",
-                  "Utilities", "Health", "Education", "Other"]
+                  "Utilities", "Health", "Education", "Subscriptions", "SchoolFees", "Travel", "Other"]
     error = None
 
     if request.method == "POST":
@@ -326,7 +326,7 @@ def edit_expense(id):
         return redirect(url_for("dashboard"))   # not found or not theirs
 
     CATEGORIES = ["Food", "Transport", "Entertainment",
-                  "Utilities", "Health", "Education", "Other"]
+                  "Utilities", "Health", "Education", "Subscriptions", "SchoolFees", "Travel", "Other"]
     error = None
 
     if request.method == "POST":

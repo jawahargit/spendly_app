@@ -1,6 +1,6 @@
 Add a new expense category to Spendly.
 
-The user will provide the new category name as an argument (e.g. `/add-category Rent`).
+The user will provide the new category name as an argument (e.g. `/add_category Rent`).
 
 Steps:
 1. Read `app.py` and locate the `CATEGORIES` list — it appears in **both** `add_expense` and `edit_expense` route functions.

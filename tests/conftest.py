@@ -29,7 +29,7 @@ def _inline_errors(data: bytes) -> list[str]:
 # ── Formatting ────────────────────────────────────────────────────────────────
 
 def _format_call_md(method: str, url: str, payload: dict | None, resp) -> str:
-    lines = ["```"]
+    lines = ["```text"]
     lines.append(f"{method:4s}  {url}")
     if payload:
         safe = {k: ("●●●●●●●●" if "password" in k.lower() else v)
@@ -101,7 +101,7 @@ def pytest_sessionfinish(session, exitstatus):
 
     with open(_LOG_FILE, "a") as f:
         f.write("## Summary\n\n")
-        f.write("| | Count |\n|---|---|\n")
+        f.write("| Result | Count |\n| --- | --- |\n")
         f.write(f"| **Total** | {total} |\n")
         f.write(f"| ✅ Passed | {passed} |\n")
         f.write(f"| ❌ Failed | {failed} |\n")
@@ -133,7 +133,6 @@ def _write_test_log(request):
     with open(_LOG_FILE, "a") as f:
         f.write(f"## {emoji} `{request.node.nodeid}`\n\n")
         if _http_buffer:
-            f.write("### HTTP Trace\n\n")
             for entry in _http_buffer:
                 f.write(entry + "\n\n")
         else:

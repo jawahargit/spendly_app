@@ -86,7 +86,7 @@ Four slash commands are available inside this project:
 
 Expense categories are hardcoded in `app.py` in both `add_expense` and `edit_expense` routes — update both if adding a new category:
 ```python
-CATEGORIES = ["Food", "Transport", "Entertainment", "Utilities", "Health", "Education", "Other"]
+CATEGORIES = ["Food", "Transport", "Entertainment", "Utilities", "Health", "Education", "Subscriptions", "SchoolFees", "Travel", "Other"]
 ```
 
 ## Security notes

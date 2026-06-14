@@ -226,7 +226,7 @@ Then renders `dashboard.html` with:
 
 - `GET /expenses/add` — renders `add_expense.html` with today's date pre-filled
 - `POST /expenses/add` — validates title/amount/date, inserts into `expenses` table, redirects to dashboard
-- Category is a `<select>` dropdown: Food, Transport, Entertainment, Utilities, Health, Education, Other
+- Category is a `<select>` dropdown: Food, Transport, Entertainment, Utilities, Health, Education, Subscriptions, SchoolFees, Travel, Other
 
 ---
 
