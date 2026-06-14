@@ -103,6 +103,16 @@ def logout():
     return redirect(url_for("landing"))
 
 
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
 # ------------------------------------------------------------------ #
 # Protected routes (login required)                                   #
 # ------------------------------------------------------------------ #

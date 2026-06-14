@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Terms & Conditions — Spendly{% endblock %}
+
+{% block content %}
+<section class="policy-section">
+    <div class="policy-container">
+        <div class="policy-header">
+            <span class="hero-badge">Legal</span>
+            <h1 class="policy-title">Terms &amp; Conditions</h1>
+            <p class="policy-meta">Last updated: June 14, 2026</p>
+        </div>
+
+        <div class="policy-body">
+            <article class="policy-card">
+
+                <section class="policy-block">
+                    <h2>1. Acceptance of Terms</h2>
+                    <p>By creating an account or using Spendly, you agree to be bound by these Terms &amp; Conditions. If you do not agree, please do not use the service.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>2. Description of Service</h2>
+                    <p>Spendly is a personal expense-tracking application that allows registered users to log, categorise, and review their financial transactions. The service is provided for personal, non-commercial use only.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>3. User Accounts</h2>
+                    <p>You must provide accurate information when registering. You are responsible for maintaining the confidentiality of your password and for all activity that occurs under your account. Notify us immediately if you suspect unauthorised access.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>4. Acceptable Use</h2>
+                    <p>You agree not to:</p>
+                    <ul>
+                        <li>Use Spendly for any unlawful purpose or in violation of any applicable law.</li>
+                        <li>Attempt to gain unauthorised access to other users' data or to the underlying systems.</li>
+                        <li>Reverse-engineer, decompile, or otherwise attempt to derive the source code of the application.</li>
+                        <li>Submit false, misleading, or fraudulent information.</li>
+                    </ul>
+                </section>
+
+                <section class="policy-block">
+                    <h2>5. Data Accuracy</h2>
+                    <p>Spendly stores the data you enter. We do not verify the accuracy of any financial information you provide. You are solely responsible for ensuring that your records are correct and up to date.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>6. Intellectual Property</h2>
+                    <p>All content, design, and code within Spendly — including the name, logo, and interface — is the property of Spendly and protected by applicable intellectual property laws. You may not reproduce or redistribute any part of the service without prior written permission.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>7. Disclaimer of Warranties</h2>
+                    <p>Spendly is provided "as is" without warranty of any kind. We do not guarantee that the service will be uninterrupted, error-free, or free of viruses or other harmful components. We make no representations regarding the accuracy or completeness of any information provided through the service.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>8. Limitation of Liability</h2>
+                    <p>To the fullest extent permitted by law, Spendly shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service, including loss of data or financial loss.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>9. Modifications to Terms</h2>
+                    <p>We may update these Terms &amp; Conditions from time to time. Continued use of Spendly after changes are posted constitutes your acceptance of the revised terms. We encourage you to review this page periodically.</p>
+                </section>
+
+                <section class="policy-block">
+                    <h2>10. Governing Law</h2>
+                    <p>These terms are governed by and construed in accordance with applicable law. Any disputes shall be subject to the exclusive jurisdiction of the relevant courts.</p>
+                </section>
+
+                <section class="policy-block policy-block--last">
+                    <h2>11. Contact</h2>
+                    <p>If you have questions about these Terms &amp; Conditions, please reach out through the contact information provided on our website.</p>
+                </section>
+
+            </article>
+
+            <div class="policy-footer-nav">
+                <a href="{{ url_for('privacy') }}" class="btn-ghost">Read our Privacy Policy &rarr;</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

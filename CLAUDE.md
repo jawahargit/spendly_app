@@ -46,9 +46,9 @@ The entire backend lives in a single file, `app.py`. There is no blueprint or se
 
 **Dashboard chart:** Chart.js (loaded from CDN in `dashboard.html`'s `{% block scripts %}`) reads category data embedded as `<script id="chartData" type="application/json">` by Jinja2 — no separate API endpoint.
 
-**Templates:** All pages extend `templates/base.html`. The `{% block scripts %}` extension point is used by `dashboard.html` for Chart.js. The navbar reads `session.user_id` directly in Jinja2.
+**Templates:** All pages extend `templates/base.html`. The `{% block scripts %}` extension point is used by `dashboard.html` for Chart.js. The navbar reads `session.user_id` directly in Jinja2. `templates/terms.html` and `templates/privacy.html` are public-facing legal pages that extend `base.html` and use the `.policy-*` CSS classes.
 
-**CSS:** Single file `static/css/style.css` using CSS custom properties defined in `:root`. Brand colors: `--accent: #1a472a` (green), `--accent-2: #c17f24` (gold), `--danger: #c0392b` (red).
+**CSS:** Single file `static/css/style.css` using CSS custom properties defined in `:root`. Brand colors: `--accent: #1a472a` (green), `--accent-2: #c17f24` (gold), `--danger: #c0392b` (red). Policy pages use `.policy-section`, `.policy-container`, `.policy-card`, `.policy-block`, and `.policy-block h2` (coloured `--accent`). Footer legal links use `.footer-links` — muted by default, gold (`--accent-2`) on hover.
 
 ## Fixed categories
 
@@ -59,6 +59,6 @@ CATEGORIES = ["Food", "Transport", "Entertainment", "Utilities", "Health", "Educ
 
 ## Security notes
 
-- `app.secret_key` is hardcoded as `"spendly-dev-secret-key-change-in-production"` — must be replaced with an environment variable before any real deployment
+- `app.secret_key` is read from the `SECRET_KEY` environment variable (via `python-dotenv`) — set it in a `.env` file for local development; never hardcode it
 - All expense mutations (`UPDATE`, `DELETE`) include `AND user_id = ?` to prevent users from touching each other's data
 - Login returns the same error message for "user not found" and "wrong password" to prevent email enumeration

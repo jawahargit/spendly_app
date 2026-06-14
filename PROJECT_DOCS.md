@@ -33,6 +33,7 @@
 - ✅ See spending broken down by category in a doughnut chart
 - ✅ View their 5 most recent transactions
 - ✅ Manage their profile (update name, change password)
+- ✅ Read public Terms & Conditions and Privacy Policy pages (no login required)
 
 ---
 
@@ -291,7 +292,9 @@ expense-tracker/
 │   ├── dashboard.html        ← Main app screen (stats + chart + expenses)
 │   ├── add_expense.html      ← Add new transaction form
 │   ├── edit_expense.html     ← Edit existing transaction form
-│   └── profile.html          ← User info + change password
+│   ├── profile.html          ← User info + change password
+│   ├── terms.html            ← Terms & Conditions (public)
+│   └── privacy.html          ← Privacy Policy (public)
 │
 ├── static/
 │   ├── css/
@@ -324,7 +327,9 @@ Flask app
 │   ├── POST /register        → Validate → hash password → insert user → start session
 │   ├── GET  /login           → Show login form
 │   ├── POST /login           → Check credentials → start session
-│   └── GET  /logout          → Clear session → redirect to /
+│   ├── GET  /logout          → Clear session → redirect to /
+│   ├── GET  /terms           → Terms & Conditions page
+│   └── GET  /privacy         → Privacy Policy page
 │
 └── Protected routes (redirect to /login if no session)
     ├── GET  /dashboard             → Fetch stats + categories + recent → render chart
@@ -531,6 +536,17 @@ Email is `readonly` — it's displayed but cannot be changed (enforced in both H
 
 ---
 
+### `templates/terms.html` / `templates/privacy.html` — Legal Pages
+
+Two public-facing pages accessible without a login. Both:
+- Extend `base.html` (navbar, footer, fonts, CSS)
+- Use the `.policy-*` CSS layout: a centred `policy-container` (max 760 px), a `policy-header` with a badge + serif title, and a `policy-card` holding numbered `policy-block` sections separated by hairline borders
+- Section headings are styled in `--accent` green via `.policy-block h2`
+- Each page ends with a cross-link button (`btn-ghost`) pointing to the other legal page
+- Linked from the footer (`base.html`) via `url_for('terms')` and `url_for('privacy')` inside `.footer-links`
+
+---
+
 ### `static/css/style.css` — The Design System
 
 One file styles the entire app. Organised into sections:
@@ -549,7 +565,8 @@ Form extras    → .form-row (2-col), .form-select, .form-textarea
 Dashboard      → .dash-wrap, .stat-grid, .stat-card, .dash-grid, .dash-card
 Category chart → .chart-wrap, .chart-legend, .legend-row, .legend-dot
 Expense list   → .expense-list, .expense-row, .expense-actions, .action-link
-Footer         → dark footer strip
+Footer         → dark footer strip; .footer-links for Terms/Privacy links (gold on hover)
+Policy pages   → .policy-section, .policy-container, .policy-card, .policy-block
 Responsive     → media queries for 900px and 600px breakpoints
 ```
 
@@ -673,10 +690,9 @@ venv/bin/pip install -r requirements.txt
 │  └──────────┬───────────┘               │  add_expense.html   │ │
 │             │                           │  edit_expense.html  │ │
 │             │ SQL queries               │  profile.html       │ │
-│             ▼                           └─────────────────────┘ │
-│  ┌──────────────────────┐                                       │
-│  │   spendly.db         │                                       │
-│  │   (SQLite file)      │                                       │
+│             ▼                           │  terms.html         │ │
+│  ┌──────────────────────┐               │  privacy.html       │ │
+│  │   spendly.db         │               └─────────────────────┘ │
 │  │                      │                                       │
 │  │   TABLE users        │                                       │
 │  │   TABLE expenses     │                                       │
@@ -821,12 +837,16 @@ and the user is sent to the login page.
 
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
+| Method | URL | Auth | Description |
+|--------|-----|------|-------------|
 | GET | `/` | Public | Landing / marketing page |
 | GET | `/register` | Public | Show registration form |
 | POST | `/register` | Public | Process registration |
 | GET | `/login` | Public | Show login form |
 | POST | `/login` | Public | Process login |
-| GET | `/logout` | Protected | Clear session, redirect to `/` |
+| GET | `/logout` | Public | Clear session, redirect to `/` |
+| GET | `/terms` | Public | Terms & Conditions page |
+| GET | `/privacy` | Public | Privacy Policy page |
 | GET | `/dashboard` | Protected | Main screen — stats, chart, recent expenses |
 | GET | `/profile` | Protected | Show profile info + stats |
 | POST | `/profile` | Protected | Update name OR change password |
