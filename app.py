@@ -1,9 +1,13 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 from database.db import get_db, init_db
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "spendly-dev-secret-key-change-in-production"
+app.secret_key = os.environ["SECRET_KEY"]
 
 # Initialise tables on startup
 with app.app_context():
