@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+
+<div class="dash-wrap" style="max-width: 680px;">
+
+    <!-- ── Page header ── -->
+    <div class="dash-header">
+        <div>
+            <h1 class="dash-title">Your <em>profile</em></h1>
+            <p class="dash-subtitle">Manage your account details and password.</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn-ghost">← Dashboard</a>
+    </div>
+
+    <!-- ── Stats strip ── -->
+    <div class="stat-grid" style="grid-template-columns: repeat(3,1fr); margin-bottom: 1.75rem;">
+        <div class="stat-card">
+            <span class="stat-label">Member since</span>
+            <span class="stat-value" style="font-size:1.1rem; padding-top:.25rem;">
+                {{ user.created_at[:10] }}
+            </span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Transactions</span>
+            <span class="stat-value">{{ stats.tx_count }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Total spent</span>
+            <span class="stat-value">₹{{ "%.0f"|format(stats.total_spent) }}</span>
+        </div>
+    </div>
+
+    <!-- ── Edit info ── -->
+    <div class="dash-card" style="margin-bottom: 1.25rem;">
+        <h2 class="dash-card-title">Account information</h2>
+
+        {% if info_error %}
+        <div class="auth-error">{{ info_error }}</div>
+        {% endif %}
+        {% if info_success %}
+        <div class="auth-success">{{ info_success }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('profile') }}">
+            <input type="hidden" name="action" value="update_info">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Full name</label>
+                    <input type="text" id="name" name="name"
+                           class="form-input"
+                           value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email"
+                           class="form-input form-input--readonly"
+                           value="{{ user.email }}" readonly>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" style="width:auto; padding: 0.6rem 1.75rem;">
+                Save changes
+            </button>
+        </form>
+    </div>
+
+    <!-- ── Change password ── -->
+    <div class="dash-card">
+        <h2 class="dash-card-title">Change password</h2>
+
+        {% if pw_error %}
+        <div class="auth-error">{{ pw_error }}</div>
+        {% endif %}
+        {% if pw_success %}
+        <div class="auth-success">{{ pw_success }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('profile') }}">
+            <input type="hidden" name="action" value="change_password">
+
+            <div class="form-group">
+                <label for="current_password">Current password</label>
+                <input type="password" id="current_password" name="current_password"
+                       class="form-input" placeholder="Enter current password" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="new_password">New password</label>
+                    <input type="password" id="new_password" name="new_password"
+                           class="form-input" placeholder="Min. 8 characters" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm new password</label>
+                    <input type="password" id="confirm_password" name="confirm_password"
+                           class="form-input" placeholder="Repeat new password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" style="width:auto; padding: 0.6rem 1.75rem;">
+                Update password
+            </button>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
