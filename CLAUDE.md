@@ -6,6 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Spendly** — a personal expense tracker built with Flask, SQLite, and vanilla CSS/JS. Named "Spendly" throughout the UI and database, despite the repo folder being `expense-tracker`.
 
+## Running the App
+Use a Python virtual environment: `python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt`. Then run with `venv/bin/python app.py`. If you hit 'externally-managed-environment' errors, always use the venv.
+
 ## Commands
 
 ```bash
