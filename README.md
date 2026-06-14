@@ -14,6 +14,7 @@ A personal finance web app built with **Python / Flask**, **SQLite**, and **vani
 - Profile page — update display name, change password
 - Public Terms & Conditions and Privacy Policy pages
 - Full automated test suite (42 tests) with per-run HTTP trace log
+- **REST JSON API** with interactive Swagger UI at `/apidocs/` (powered by Flasgger)
 
 ---
 
@@ -29,6 +30,7 @@ A personal finance web app built with **Python / Flask**, **SQLite**, and **vani
 | CSS | Plain CSS with custom properties |
 | Fonts | Google Fonts — DM Serif Display, DM Sans |
 | Chart | Chart.js 4.4 (CDN) |
+| API docs | Flasgger 0.9.7 (Swagger UI) |
 | Testing | pytest + pytest-flask |
 
 ---
@@ -60,6 +62,10 @@ Open **http://127.0.0.1:5001** in your browser.
 - Email: `nitish@example.com`
 - Password: `password123`
 
+**Swagger UI (API tester):** http://127.0.0.1:5001/apidocs/
+- Open the link, expand **Auth → POST /api/auth/login**, click "Try it out", enter the sample credentials, and Execute.
+- All other endpoints are unlocked once the session cookie is set.
+
 > **Environment variable:** create a `.env` file in the project root with `SECRET_KEY=your-secret-here` before running.
 
 ---
@@ -82,7 +88,8 @@ A full HTTP trace log is auto-written to **`tests/test_logs.md`** after every ru
 
 ```
 expense-tracker/
-├── app.py                  ← All routes and backend logic
+├── app.py                  ← All HTML routes, Flasgger config, Blueprint registration
+├── api_routes.py           ← JSON REST API Blueprint (all /api/* endpoints)
 ├── requirements.txt
 ├── pytest.ini
 │
@@ -122,6 +129,8 @@ expense-tracker/
 
 ## Route Map
 
+### HTML routes (browser)
+
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
 | GET | `/` | Public | Landing page |
@@ -135,6 +144,25 @@ expense-tracker/
 | GET / POST | `/expenses/add` | Protected | Add a new expense |
 | GET / POST | `/expenses/<id>/edit` | Protected | Edit an existing expense |
 | POST | `/expenses/<id>/delete` | Protected | Delete an expense |
+
+### REST API routes (JSON) — testable at `/apidocs/`
+
+| Method | URL | Auth | Description |
+|--------|-----|------|-------------|
+| POST | `/api/auth/register` | Public | Register and start session |
+| POST | `/api/auth/login` | Public | Login and start session |
+| POST | `/api/auth/logout` | Public | Clear session |
+| GET | `/api/dashboard` | Session | Spending summary stats |
+| GET | `/api/expenses` | Session | List expenses (supports `?category=` & `?limit=`) |
+| POST | `/api/expenses` | Session | Create a new expense |
+| GET | `/api/expenses/<id>` | Session | Get a single expense |
+| PUT | `/api/expenses/<id>` | Session | Update an expense |
+| DELETE | `/api/expenses/<id>` | Session | Delete an expense |
+| GET | `/api/profile` | Session | Get profile + stats |
+| PATCH | `/api/profile` | Session | Update display name |
+| PATCH | `/api/profile/password` | Session | Change password |
+
+> **Authentication:** call `POST /api/auth/login` first — the session cookie is stored in your browser and sent automatically with every subsequent request. No API key or Bearer token needed.
 
 ---
 
@@ -153,8 +181,9 @@ When working in this repo with Claude Code, four `/` commands are available:
 
 ## Documentation
 
-- **`PROJECT_DOCS.md`** — full architecture, file-by-file explanation, DB schema, auth flow diagrams, request-response walkthroughs, and test suite details
+- **`PROJECT_DOCS.md`** — full architecture, file-by-file explanation, DB schema, auth flow diagrams, request-response walkthroughs, REST API reference, and test suite details
 - **`CLAUDE.md`** — guidance for Claude Code: commands, architecture notes, CSS variables, security notes, testing setup
+- **`/apidocs/`** — interactive Swagger UI listing all REST API endpoints with live "Try it out" testing
 
 ---
 

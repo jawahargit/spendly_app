@@ -19,9 +19,10 @@
 9. [Request–Response Flow](#9-requestresponse-flow)
 10. [Authentication Flow](#10-authentication-flow)
 11. [Route Map](#11-route-map)
-12. [How Each Module Powers the App](#12-how-each-module-powers-the-app)
-13. [Test Suite](#13-test-suite)
-14. [Project Skills (Slash Commands)](#14-project-skills-slash-commands)
+12. [REST API Reference](#12-rest-api-reference)
+13. [How Each Module Powers the App](#13-how-each-module-powers-the-app)
+14. [Test Suite](#14-test-suite)
+15. [Project Skills (Slash Commands)](#15-project-skills-slash-commands)
 
 ---
 
@@ -36,6 +37,7 @@
 - ✅ View their 5 most recent transactions
 - ✅ Manage their profile (update name, change password)
 - ✅ Read public Terms & Conditions and Privacy Policy pages (no login required)
+- ✅ Access all functionality via a **REST JSON API** and test it interactively through Swagger UI (`/apidocs/`)
 
 ---
 
@@ -52,6 +54,7 @@
 | CSS | Plain CSS + custom properties | Styling and layout |
 | Fonts | Google Fonts (DM Serif Display, DM Sans) | Typography |
 | Chart | Chart.js 4.4 (CDN) | Doughnut chart on dashboard |
+| API Docs | Flasgger 0.9.7 (Swagger UI) | Interactive REST API explorer at `/apidocs/` |
 | Testing | pytest + pytest-flask | Automated tests |
 
 ---
@@ -116,6 +119,7 @@ Create a file named `requirements.txt` in the project root:
 ```
 flask==3.1.3
 werkzeug==3.1.6
+flasgger==0.9.7.1
 pytest==8.3.5
 pytest-flask==1.3.0
 ```
@@ -278,7 +282,8 @@ A hidden `<input name="action">` field in each form tells the backend which acti
 ```
 expense-tracker/
 │
-├── app.py                    ← All backend routes and logic
+├── app.py                    ← HTML routes, Flasgger config, Blueprint registration
+├── api_routes.py             ← JSON REST API Blueprint (all /api/* endpoints)
 ├── requirements.txt          ← Python package dependencies
 ├── pytest.ini                ← Sets pythonpath=. so imports resolve from project root
 │
@@ -330,12 +335,14 @@ expense-tracker/
 
 ### `app.py` — The Brain
 
-The single file that runs the entire backend.
+The single file that runs the entire backend. It now also wires up Flasgger and registers the API Blueprint.
 
 ```
 Flask app
 │
 ├── app.secret_key            → Signs session cookies so they can't be tampered with
+├── register_blueprint(api)   → Mounts all /api/* routes from api_routes.py
+├── Swagger(app, ...)         → Serves Swagger UI at /apidocs/ (spec from /apispec.json)
 ├── init_db() on startup      → Ensures tables exist every time the server starts
 │
 ├── Public routes (no login needed)
@@ -368,7 +375,41 @@ Flask app
 | `session` | Storing `user_id` and `user_name` across requests |
 | `generate_password_hash` | Hashing plain-text password before saving |
 | `check_password_hash` | Verifying a plain-text password against a stored hash |
+| `Swagger` (Flasgger) | Generates `/apidocs/` Swagger UI from route docstrings |
 | `get_db`, `init_db` | From our own `database/db.py` |
+| `api` (Blueprint) | REST API routes from `api_routes.py` |
+
+---
+
+### `api_routes.py` — The REST API Layer
+
+A Flask Blueprint (`url_prefix="/api"`) that mirrors every HTML route as a JSON endpoint. It is imported and registered in `app.py`.
+
+```
+api Blueprint  (prefix: /api)
+│
+├── Auth
+│   ├── POST /api/auth/register   → Validate → hash → INSERT user → set session → 201 JSON
+│   ├── POST /api/auth/login      → Check credentials → set session → 200 JSON
+│   └── POST /api/auth/logout     → session.clear() → 200 JSON
+│
+├── Dashboard
+│   └── GET  /api/dashboard       → month total, all-time total, tx count, top 5 categories, recent 5 → JSON
+│
+├── Expenses (CRUD)
+│   ├── GET    /api/expenses            → list (optional ?category= ?limit= filters)
+│   ├── POST   /api/expenses            → INSERT → {message, id}
+│   ├── GET    /api/expenses/<id>       → single row or 404
+│   ├── PUT    /api/expenses/<id>       → UPDATE (partial-friendly, keeps existing values for omitted fields)
+│   └── DELETE /api/expenses/<id>       → DELETE or 404
+│
+└── Profile
+    ├── GET   /api/profile          → user row + spending stats
+    ├── PATCH /api/profile          → UPDATE name only
+    └── PATCH /api/profile/password → verify current, UPDATE hashed new password
+```
+
+Every endpoint carries a **Swagger 2.0 YAML docstring** that Flasgger reads to build the interactive spec. Authentication is session-based — call `/api/auth/login` once and the browser cookie is sent automatically from that point on.
 
 ---
 
@@ -619,6 +660,7 @@ Future JavaScript features (form validation, animations) would go here.
 ```
 flask==3.1.3        ← Web framework
 werkzeug==3.1.6     ← Password hashing + WSGI utilities (Flask depends on this)
+flasgger==0.9.7.1   ← Swagger UI generation from route docstrings
 pytest==8.3.5       ← Test runner
 pytest-flask==1.3.0 ← Flask test client helpers
 ```
@@ -852,6 +894,8 @@ and the user is sent to the login page.
 
 ## 11. Route Map
 
+### HTML routes (browser, return Jinja2-rendered pages)
+
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
 | GET | `/` | Public | Landing / marketing page |
@@ -871,9 +915,83 @@ and the user is sent to the login page.
 | POST | `/expenses/<id>/edit` | Protected | Save updated expense |
 | POST | `/expenses/<id>/delete` | Protected | Delete expense |
 
+### REST API routes (return JSON, testable at `/apidocs/`)
+
+| Method | URL | Auth | Description |
+|--------|-----|------|-------------|
+| POST | `/api/auth/register` | Public | Register and start session |
+| POST | `/api/auth/login` | Public | Login and start session |
+| POST | `/api/auth/logout` | Public | Clear session |
+| GET | `/api/dashboard` | Session | Spending summary stats |
+| GET | `/api/expenses` | Session | List expenses (`?category=` and `?limit=` supported) |
+| POST | `/api/expenses` | Session | Create a new expense |
+| GET | `/api/expenses/<id>` | Session | Get a single expense |
+| PUT | `/api/expenses/<id>` | Session | Update an expense |
+| DELETE | `/api/expenses/<id>` | Session | Delete an expense |
+| GET | `/api/profile` | Session | Get profile + spending stats |
+| PATCH | `/api/profile` | Session | Update display name |
+| PATCH | `/api/profile/password` | Session | Change password |
+| GET | `/apidocs/` | Public | Swagger UI — interactive API explorer |
+| GET | `/apispec.json` | Public | Raw OpenAPI spec (Swagger 2.0 JSON) |
+
 ---
 
-## 12. How Each Module Powers the App
+## 12. REST API Reference
+
+The REST API layer lives entirely in `api_routes.py` and is mounted at `/api/`. All endpoints return `application/json`. The interactive Swagger UI is available at **http://127.0.0.1:5001/apidocs/** while the server is running.
+
+### Authentication
+
+The API uses the same Flask session cookie as the HTML app — no separate tokens or headers are needed.
+
+1. Call `POST /api/auth/login` with `{"email": "...", "password": "..."}`.
+2. The response sets a session cookie in your browser.
+3. Every subsequent request to protected endpoints is automatically authenticated.
+
+### Endpoint Summary
+
+#### Auth
+
+| Endpoint | Body | Success | Notes |
+|----------|------|---------|-------|
+| `POST /api/auth/register` | `{name, email, password}` | 201 + user object | Sets session immediately |
+| `POST /api/auth/login` | `{email, password}` | 200 + user object | Sets session |
+| `POST /api/auth/logout` | — | 200 | Clears session |
+
+#### Dashboard
+
+| Endpoint | Params | Success |
+|----------|--------|---------|
+| `GET /api/dashboard` | — | 200 — `{month_total, all_total, tx_count, top_categories[], recent_expenses[]}` |
+
+#### Expenses
+
+| Endpoint | Body / Params | Success | Notes |
+|----------|--------------|---------|-------|
+| `GET /api/expenses` | `?category=Food&limit=50` | 200 — array | Defaults to 50, max 200 |
+| `POST /api/expenses` | `{title, amount, category, date, note?}` | 201 + `{id}` | |
+| `GET /api/expenses/<id>` | — | 200 — expense object or 404 | |
+| `PUT /api/expenses/<id>` | Any subset of expense fields | 200 | Unset fields keep existing value |
+| `DELETE /api/expenses/<id>` | — | 200 or 404 | |
+
+#### Profile
+
+| Endpoint | Body | Success |
+|----------|------|---------|
+| `GET /api/profile` | — | 200 — `{id, name, email, created_at, stats}` |
+| `PATCH /api/profile` | `{name}` | 200 |
+| `PATCH /api/profile/password` | `{current_password, new_password}` | 200 or 401 |
+
+### How to use Swagger UI
+
+1. Open **http://127.0.0.1:5001/apidocs/**
+2. Expand **Auth → POST /api/auth/login** → click **Try it out** → enter credentials → **Execute**
+3. The session cookie is now set in your browser — all other endpoints work without further setup
+4. Use the **Expenses** and **Profile** sections to test CRUD operations interactively
+
+---
+
+## 13. How Each Module Powers the App
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -923,7 +1041,7 @@ and the user is sent to the login page.
 
 ---
 
-## 13. Test Suite
+## 14. Test Suite
 
 Spendly has a full automated test suite using **pytest** and **pytest-flask**. Tests are completely isolated — each test gets its own empty SQLite database via `pytest`'s `tmp_path` fixture, so the real `database/spendly.db` is never touched.
 
@@ -999,7 +1117,7 @@ Passwords are always masked as `●●●●●●●●` in both the terminal o
 
 ---
 
-## 14. Project Skills (Slash Commands)
+## 15. Project Skills (Slash Commands)
 
 Project-specific Claude Code slash commands live in `.claude/commands/`. They are only available when working inside this repository.
 
@@ -1042,4 +1160,4 @@ venv/bin/pytest -v -s
 
 ---
 
-*Documentation updated for Spendly v1.1 — added Terms/Privacy pages, test suite (42 tests), test logging, and project slash commands*
+*Documentation updated for Spendly v1.2 — added REST JSON API (`api_routes.py`), Swagger UI at `/apidocs/`, Flasgger dependency, Terms/Privacy pages, test suite (42 tests), test logging, and project slash commands*

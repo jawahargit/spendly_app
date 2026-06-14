@@ -119,13 +119,13 @@
 <body>
   <div class="container">
     <h1>Claude Code Insights</h1>
-    <p class="subtitle">103 messages across 6 sessions | 2026-05-23 to 2026-06-14</p>
+    <p class="subtitle">103+ messages across 7 sessions | 2026-05-23 to 2026-06-15</p>
 
     
     <div class="at-a-glance">
       <div class="glance-title">At a Glance</div>
       <div class="glance-sections">
-        <div class="glance-section"><strong>What's working:</strong> You build in smooth, incremental steps rather than one giant request, which served you well when constructing the Spendly expense tracker piece by piece—database, auth, dashboard, charts—all the way to a tested, version-controlled repo. You also start projects right by asking what the codebase does and getting documentation in place before diving into changes, and you catch good-practice issues like moving a hardcoded secret key into an environment variable. <a href="#section-wins" class="see-more">Impressive Things You Did →</a></div>
+        <div class="glance-section"><strong>What's working:</strong> You build in smooth, incremental steps rather than one giant request, which served you well when constructing the Spendly expense tracker piece by piece—database, auth, dashboard, charts—all the way to a tested, version-controlled repo. Most recently you added a full REST JSON API with Swagger UI so every endpoint can be tested interactively. You also start projects right by asking what the codebase does and getting documentation in place before diving into changes, and you catch good-practice issues like moving a hardcoded secret key into an environment variable. <a href="#section-wins" class="see-more">Impressive Things You Did →</a></div>
         <div class="glance-section"><strong>What's hindering you:</strong> On Claude&apos;s side, when you hit dependency and environment errors, the diagnosis didn&apos;t always run end-to-end before you felt the need to step in. On your side, the biggest friction came from taking over manually mid-task and interrupting tool runs to supply details like port numbers—both of which broke momentum even when the work would have succeeded if Claude had been allowed to finish. <a href="#section-friction" class="see-more">Where Things Go Wrong →</a></div>
         <div class="glance-section"><strong>Quick wins to try:</strong> Try maintaining a richer CLAUDE.md that captures your run commands and known environment quirks, so setup context doesn&apos;t have to be re-established each session. For your repetitive setup and run commands, consider turning them into a Custom Skill—a reusable single-command workflow—so your heavy Bash usage becomes a few clean invocations. <a href="#section-features" class="see-more">Features to Try →</a></div>
         <div class="glance-section"><strong>Ambitious workflows:</strong> As models improve, lean into letting an agent fully bootstrap your environment: detecting the setup, creating an isolated venv, installing dependencies, and verifying the app boots before handing back control—turning your painful manual troubleshooting into an automated process. You could also adopt a test-driven feature loop where an agent writes pytest tests first, implements against them, and only surfaces a green build, compressing your multi-session feature work into single autonomous runs. <a href="#section-horizon" class="see-more">On the Horizon →</a></div>
@@ -145,11 +145,11 @@
     </nav>
 
     <div class="stats-row">
-      <div class="stat"><div class="stat-value">103</div><div class="stat-label">Messages</div></div>
-      <div class="stat"><div class="stat-value">+3,113/-46</div><div class="stat-label">Lines</div></div>
-      <div class="stat"><div class="stat-value">21</div><div class="stat-label">Files</div></div>
-      <div class="stat"><div class="stat-value">2</div><div class="stat-label">Days</div></div>
-      <div class="stat"><div class="stat-value">51.5</div><div class="stat-label">Msgs/Day</div></div>
+      <div class="stat"><div class="stat-value">103+</div><div class="stat-label">Messages</div></div>
+      <div class="stat"><div class="stat-value">+3,450/-46</div><div class="stat-label">Lines</div></div>
+      <div class="stat"><div class="stat-value">23</div><div class="stat-label">Files</div></div>
+      <div class="stat"><div class="stat-value">3</div><div class="stat-label">Days</div></div>
+      <div class="stat"><div class="stat-value">~48</div><div class="stat-label">Msgs/Day</div></div>
     </div>
 
     
@@ -195,7 +195,15 @@
           </div>
           <div class="area-desc">User asked Claude to explain what the Spendly project does and to organize their system config and Downloads folder into SAP topic folders. Claude provided clear stack/feature summaries and created a structured folder organization based on detailed specs.</div>
         </div>
-      
+
+        <div class="project-area">
+          <div class="area-header">
+            <span class="area-name">REST API &amp; Swagger UI Integration</span>
+            <span class="area-count">~1 sessions</span>
+          </div>
+          <div class="area-desc">User added a full JSON REST API layer to Spendly via a new Flask Blueprint (<code>api_routes.py</code>) with 12 endpoints covering auth, dashboard, expenses CRUD, and profile management. Flasgger was wired up to auto-generate an interactive Swagger UI at <code>/apidocs/</code>, letting every endpoint be tested from the browser without writing any client code.</div>
+        </div>
+
     </div>
     
 
@@ -205,7 +213,7 @@
         <div class="bar-row">
         <div class="bar-label">Implement Feature</div>
         <div class="bar-track"><div class="bar-fill" style="width:100%;background:#2563eb"></div></div>
-        <div class="bar-value">7</div>
+        <div class="bar-value">8</div>
       </div>
 <div class="bar-row">
         <div class="bar-label">Run Application</div>
@@ -454,7 +462,12 @@
           <div class="big-win-title">Onboarding through documentation</div>
           <div class="big-win-desc">You started by asking what the project is and got a clear summary of the stack and features before diving in. You then had a CLAUDE.md created and learned the exact bash command to run the app locally, building a solid foundation of context and docs to support every later session.</div>
         </div>
-      
+
+        <div class="big-win">
+          <div class="big-win-title">REST API + Swagger UI in one shot</div>
+          <div class="big-win-desc">You recognised that the app needed a testable API layer and asked for Swagger UI support. The result was a clean Flask Blueprint (<code>api_routes.py</code>) with 12 JSON endpoints and Flasgger wired up to serve an interactive Swagger UI at <code>/apidocs/</code> — all added without touching the existing HTML routes or breaking any tests. Login once in the browser and every endpoint is immediately explorable.</div>
+        </div>
+
     </div>
     
 
