@@ -2,12 +2,56 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+from flasgger import Swagger
 from database.db import get_db, init_db
+from api_routes import api
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
+
+# JSON API Blueprint (all routes under /api/)
+app.register_blueprint(api)
+
+# Swagger UI at /apidocs/
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": "apispec",
+            "route": "/apispec.json",
+            "rule_filter": lambda rule: rule.rule.startswith("/api/"),
+            "model_filter": lambda tag: True,
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/apidocs/",
+}
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Spendly API",
+        "description": (
+            "REST API for Spendly — personal expense tracker.\n\n"
+            "**How to authenticate:** call `POST /api/auth/login` first; "
+            "the session cookie is stored in your browser and sent automatically "
+            "with every subsequent request."
+        ),
+        "version": "1.0.0",
+    },
+    "host": "127.0.0.1:5001",
+    "basePath": "/",
+    "schemes": ["http"],
+    "tags": [
+        {"name": "Auth",      "description": "Register, login, logout"},
+        {"name": "Dashboard", "description": "Spending summary"},
+        {"name": "Expenses",  "description": "Create, read, update, delete expenses"},
+        {"name": "Profile",   "description": "User profile and password"},
+    ],
+}
+Swagger(app, config=swagger_config, template=swagger_template)
 
 # Initialise tables on startup
 with app.app_context():
