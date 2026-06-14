@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl -s http://127.0.0.1:5000/)",
       "Bash(venv/bin/pip install *)",
-      "Bash(venv/bin/python *)"
+      "Bash(venv/bin/python *)",
+      "Bash(venv/bin/pytest *)"
     ]
   }
 }
