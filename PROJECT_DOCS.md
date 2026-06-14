@@ -20,6 +20,8 @@
 10. [Authentication Flow](#10-authentication-flow)
 11. [Route Map](#11-route-map)
 12. [How Each Module Powers the App](#12-how-each-module-powers-the-app)
+13. [Test Suite](#13-test-suite)
+14. [Project Skills (Slash Commands)](#14-project-skills-slash-commands)
 
 ---
 
@@ -278,11 +280,12 @@ expense-tracker/
 │
 ├── app.py                    ← All backend routes and logic
 ├── requirements.txt          ← Python package dependencies
+├── pytest.ini                ← Sets pythonpath=. so imports resolve from project root
 │
 ├── database/
 │   ├── __init__.py           ← Makes database/ a Python package
 │   ├── db.py                 ← get_db(), init_db(), seed_db()
-│   └── spendly.db            ← SQLite database file (auto-created)
+│   └── spendly.db            ← SQLite database file (auto-created, never committed)
 │
 ├── templates/
 │   ├── base.html             ← Master layout (navbar, footer, CSS/JS links)
@@ -301,6 +304,20 @@ expense-tracker/
 │   │   └── style.css         ← Complete stylesheet (design system + every page)
 │   └── js/
 │       └── main.js           ← Frontend JavaScript (chart logic is inline)
+│
+├── tests/
+│   ├── conftest.py           ← Fixtures, InstrumentedClient, session log hooks
+│   ├── test_auth.py          ← 16 tests: register, login, logout
+│   ├── test_expenses.py      ← 17 tests: add, edit, delete expenses
+│   ├── test_dashboard.py     ← 9 tests: dashboard data and access control
+│   └── test_logs.md          ← Auto-generated on every run (do not edit manually)
+│
+├── .claude/
+│   └── commands/             ← Project slash commands for Claude Code
+│       ├── seed.md           ← /seed
+│       ├── run.md            ← /run
+│       ├── test.md           ← /test
+│       └── add-category.md   ← /add-category
 │
 └── venv/                     ← Python virtual environment (never edit)
 ```
@@ -837,8 +854,6 @@ and the user is sent to the login page.
 
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
-| Method | URL | Auth | Description |
-|--------|-----|------|-------------|
 | GET | `/` | Public | Landing / marketing page |
 | GET | `/register` | Public | Show registration form |
 | POST | `/register` | Public | Process registration |
@@ -908,6 +923,95 @@ and the user is sent to the login page.
 
 ---
 
+## 13. Test Suite
+
+Spendly has a full automated test suite using **pytest** and **pytest-flask**. Tests are completely isolated — each test gets its own empty SQLite database via `pytest`'s `tmp_path` fixture, so the real `database/spendly.db` is never touched.
+
+### Running tests
+
+```bash
+venv/bin/pytest              # quiet run — just pass/fail counts
+venv/bin/pytest -v           # verbose — test names + results
+venv/bin/pytest -v -s        # verbose + live HTTP trace printed to terminal
+venv/bin/pytest tests/test_auth.py -v   # single file
+```
+
+### Test files
+
+| File | Tests | Coverage |
+|------|-------|---------|
+| `tests/test_auth.py` | 16 | Register (success, duplicate email, missing fields, short password), login (correct/wrong credentials, email enumeration, missing fields), logout (session cleared, redirect, protected route guard) |
+| `tests/test_expenses.py` | 17 | Add (success, all validation errors), edit (success, validation, pre-fill, cross-user isolation), delete (success, cross-user isolation), all require-login guards |
+| `tests/test_dashboard.py` | 9 | Auth guard, page load, greeting, empty/zero state, expense appears in list, transaction count, per-user data isolation, category chart data, add-expense link |
+
+### `tests/conftest.py` — How the test harness works
+
+```
+conftest.py
+│
+├── app fixture
+│   └── Patches database.db.DB_PATH → tmp_path/test_spendly.db
+│       Calls init_db() to create fresh tables
+│       Each test gets its own empty database
+│
+├── client fixture
+│   └── Returns _InstrumentedClient wrapping the Flask test client
+│       Every .get() and .post() call:
+│         ├── Executes the real HTTP request
+│         ├── Prints method / data / status / page / errors to stdout
+│         └── Appends a Markdown-formatted entry to _http_buffer
+│
+├── pytest_sessionstart hook
+│   └── Deletes previous test_logs.md and writes a fresh header + timestamp
+│
+├── _write_test_log autouse fixture (runs for every test automatically)
+│   ├── Setup:    clears _http_buffer
+│   └── Teardown: writes the test's node ID, ✅/❌ result, and full HTTP
+│                 trace to tests/test_logs.md
+│
+└── pytest_sessionfinish hook
+    └── Appends summary table (Total / Passed / Failed) to test_logs.md
+```
+
+### `tests/test_logs.md` — Auto-generated log
+
+Every `pytest` run **deletes** the previous log and writes a new one. Never edit this file manually. Structure:
+
+```
+# Spendly — Test Run Log
+Run date: 2026-06-14 19:17:14
+
+## ✅ `tests/test_auth.py::TestRegister::test_register_success_...`
+### HTTP Trace
+POST /register  data → {name, email, password=●●●●●●●●}  status← 200  page → Dashboard — Spendly
+
+## ❌ `tests/test_auth.py::TestRegister::test_some_failing_test`
+### HTTP Trace
+POST /register  ...  error → Some error message
+
+## Summary
+| Total | 42 |
+| ✅ Passed | 42 |
+| ❌ Failed | 0 |
+```
+
+Passwords are always masked as `●●●●●●●●` in both the terminal output and the log file.
+
+---
+
+## 14. Project Skills (Slash Commands)
+
+Project-specific Claude Code slash commands live in `.claude/commands/`. They are only available when working inside this repository.
+
+| Command | File | What it does |
+|---------|------|-------------|
+| `/seed` | `seed.md` | Deletes `spendly.db` and re-runs `database/db.py` to recreate schema and insert sample data |
+| `/run` | `run.md` | Checks DB exists (seeds if not), then starts `venv/bin/python app.py` on port 5001 |
+| `/test` | `test.md` | Runs `venv/bin/pytest -v` and reports pass/fail counts with any failure details |
+| `/add-category <name>` | `add-category.md` | Adds a new category to both `CATEGORIES` lists in `app.py` (the two lists must always stay in sync) |
+
+---
+
 ## Quick Reference — Running the App
 
 ```bash
@@ -930,8 +1034,12 @@ venv/bin/python app.py
 # Sample login credentials (from seed data)
 # Email:    nitish@example.com
 # Password: password123
+
+# 6. Run the test suite
+venv/bin/pytest -v -s
+# Log saved to tests/test_logs.md after every run
 ```
 
 ---
 
-*Documentation generated for Spendly v1.0 — built with Flask + SQLite*
+*Documentation updated for Spendly v1.1 — added Terms/Privacy pages, test suite (42 tests), test logging, and project slash commands*

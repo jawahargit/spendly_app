@@ -1,65 +1,166 @@
-❯ provide me claude code prompt togenerate such a well crafted detail .md file in future projects                                                      
+# Spendly — Personal Expense Tracker
 
-⏺ Here's a reusable prompt you can paste into Claude Code for any future project:
+A personal finance web app built with **Python / Flask**, **SQLite**, and **vanilla CSS/JS**. Track every rupee, own your finances.
 
-  ---
+---
 
-  Generate a comprehensive PROJECT_DOCS.md file for this project and save it in the project root folder.
+## Features
 
-  The file must include all of the following sections:
+- Register and log in securely (passwords hashed with Werkzeug PBKDF2)
+- Add, edit, and delete personal expenses
+- Dashboard with this-month total, all-time total, and transaction count
+- Spending breakdown by category — doughnut chart (Chart.js)
+- Recent transactions list with inline edit / delete
+- Profile page — update display name, change password
+- Public Terms & Conditions and Privacy Policy pages
+- Full automated test suite (42 tests) with per-run HTTP trace log
 
-  1. **What the App Does** — A clear summary of the app's purpose and a bullet list of all features currently built.
+---
 
-  2. **Tech Stack Overview** — A table listing every technology/library used, which layer it belongs to (backend, frontend, database, etc.), and its
-  specific role in the project.
+## Tech Stack
 
-  3. **Starting the Project in VS Code (From Scratch)** — Step-by-step instructions for someone setting up the project for the first time: creating the
-   folder, opening VS Code, setting up a virtual environment, selecting the Python interpreter, installing dependencies, creating the folder structure,
-   and running the app.
+| Layer | Technology |
+|-------|-----------|
+| Language | Python 3.13 |
+| Web framework | Flask 3.1 |
+| Database | SQLite 3 (via `sqlite3` stdlib) |
+| Password hashing | Werkzeug (PBKDF2) |
+| Templating | Jinja2 |
+| CSS | Plain CSS with custom properties |
+| Fonts | Google Fonts — DM Serif Display, DM Sans |
+| Chart | Chart.js 4.4 (CDN) |
+| Testing | pytest + pytest-flask |
 
-  4. **Step-by-Step Build Guide** — For each feature or module that was built, explain: the goal, what files were created or modified, what logic was
-  implemented, and any important decisions made.
+---
 
-  5. **Project Structure** — An annotated folder/file tree showing every file and a one-line description of what it does.
+## Quick Start
 
-  6. **File-by-File Explanation** — A deep-dive section for every significant file. For each file explain: what it does, key functions/classes/routes
-  inside it, what libraries it uses and why, and how it connects to other files.
+```bash
+# 1. Clone and enter the project
+git clone <repo-url>
+cd expense-tracker
 
-  7. **Database Schema** — ASCII table diagrams for every table showing column names, types, constraints, and relationships (foreign keys, cascades).
+# 2. Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 
-  8. **Architecture Diagram** — A full ASCII diagram showing how all layers of the app connect: browser → backend → database → templates → static
-  files.
+# 3. Install dependencies
+venv/bin/pip install -r requirements.txt
 
-  9. **Request–Response Flow** — A numbered step-by-step walkthrough (using a concrete example like "user submits a form") tracing the full journey
-  from browser click → route → validation → database → redirect → rendered page.
-  10. **Authentication Flow** — Separate flow diagrams for Register, Login, Logout, and the protected route guard — showing every branch (success path
-  and all error paths).
-  
-  11. **Route Map** — A table of every route in the app: HTTP method, URL pattern, whether auth is required, and a description of what it does.
-  
-  12. **How Each Module Powers the App** — A visual ASCII diagram showing the dependency chain between all files/modules and how data flows between
-  them at runtime.
-  
-  13. **Quick Reference** — The exact commands needed to activate the environment, install packages, seed the database, and start the server. Include
-  any sample login credentials from seed data. 
-  
-  Use ASCII diagrams for all architecture and flow visuals (no external image links).
-  Format everything in clean GitHub-flavored Markdown with tables, code blocks, and headers.
-  The tone should be educational — suitable for a student or new developer reading it for the first time.
+# 4. Seed the database with sample data
+venv/bin/python database/db.py
 
-  ---
-  Tips for best results
+# 5. Start the development server
+venv/bin/python app.py
+```
 
-  ┌────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────┐
-  │                          Tip                           │                                   Why                                   │
-  ├────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
-  │ Run it after the project is fully built                │ Claude will have all the code in context and generate accurate diagrams │
-  ├────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
-  │ Add for a [Flask/Django/React/etc.] project            │ Tailors the stack-specific details                                      │
-  ├────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
-  │ Add targeted at beginners or for a senior dev audience │ Adjusts the tone and depth                                              │
-  ├────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
-  │ Add also include a Troubleshooting section             │ Useful for common setup errors                                          │
-  ├────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
-  │ Add include a TODO / Roadmap section                   │ Documents what's left to build                                          │
-  └────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────┘
+Open **http://127.0.0.1:5001** in your browser.
+
+**Sample credentials** (from seed data):
+- Email: `nitish@example.com`
+- Password: `password123`
+
+> **Environment variable:** create a `.env` file in the project root with `SECRET_KEY=your-secret-here` before running.
+
+---
+
+## Running Tests
+
+```bash
+# Run all 42 tests (quiet)
+venv/bin/pytest
+
+# Verbose with live HTTP trace printed to terminal
+venv/bin/pytest -v -s
+```
+
+A full HTTP trace log is auto-written to **`tests/test_logs.md`** after every run (previous log is always deleted first). Each entry shows the request payload, HTTP status, page landed on, and any error messages returned.
+
+---
+
+## Project Structure
+
+```
+expense-tracker/
+├── app.py                  ← All routes and backend logic
+├── requirements.txt
+├── pytest.ini
+│
+├── database/
+│   ├── db.py               ← get_db(), init_db(), seed_db()
+│   └── spendly.db          ← SQLite file (auto-created, not committed)
+│
+├── templates/
+│   ├── base.html           ← Master layout (navbar + footer)
+│   ├── landing.html        ← Public marketing page
+│   ├── login.html / register.html
+│   ├── dashboard.html      ← Stats + chart + recent expenses
+│   ├── add_expense.html / edit_expense.html
+│   ├── profile.html
+│   ├── terms.html          ← Terms & Conditions (public)
+│   └── privacy.html        ← Privacy Policy (public)
+│
+├── static/
+│   ├── css/style.css       ← Full design system (CSS custom properties)
+│   └── js/main.js
+│
+├── tests/
+│   ├── conftest.py         ← Fixtures, InstrumentedClient, log hooks
+│   ├── test_auth.py        ← 16 tests
+│   ├── test_expenses.py    ← 17 tests
+│   ├── test_dashboard.py   ← 9 tests
+│   └── test_logs.md        ← Auto-generated on every test run
+│
+└── .claude/commands/       ← Project slash commands for Claude Code
+    ├── seed.md             ← /seed
+    ├── run.md              ← /run
+    ├── test.md             ← /test
+    └── add-category.md     ← /add-category <name>
+```
+
+---
+
+## Route Map
+
+| Method | URL | Auth | Description |
+|--------|-----|------|-------------|
+| GET | `/` | Public | Landing page |
+| GET / POST | `/register` | Public | Register a new account |
+| GET / POST | `/login` | Public | Sign in |
+| GET | `/logout` | Public | Clear session, redirect to `/` |
+| GET | `/terms` | Public | Terms & Conditions |
+| GET | `/privacy` | Public | Privacy Policy |
+| GET | `/dashboard` | Protected | Stats, chart, recent expenses |
+| GET / POST | `/profile` | Protected | Update name or change password |
+| GET / POST | `/expenses/add` | Protected | Add a new expense |
+| GET / POST | `/expenses/<id>/edit` | Protected | Edit an existing expense |
+| POST | `/expenses/<id>/delete` | Protected | Delete an expense |
+
+---
+
+## Project Slash Commands (Claude Code)
+
+When working in this repo with Claude Code, four `/` commands are available:
+
+| Command | What it does |
+|---------|-------------|
+| `/seed` | Wipes `spendly.db` and reseeds it with sample data |
+| `/run` | Seeds DB if needed, then starts the dev server on port 5001 |
+| `/test` | Runs `pytest -v` and reports results |
+| `/add-category <name>` | Adds a new expense category to both places in `app.py` |
+
+---
+
+## Documentation
+
+- **`PROJECT_DOCS.md`** — full architecture, file-by-file explanation, DB schema, auth flow diagrams, request-response walkthroughs, and test suite details
+- **`CLAUDE.md`** — guidance for Claude Code: commands, architecture notes, CSS variables, security notes, testing setup
+
+---
+
+## Security Notes
+
+- `SECRET_KEY` is read from the environment — never hardcoded
+- Passwords stored as Werkzeug PBKDF2 hashes, never plain text
+- All expense mutations include `AND user_id = ?` — users cannot touch each other's data
+- Login returns the same error for unknown email and wrong password (prevents email enumeration)
